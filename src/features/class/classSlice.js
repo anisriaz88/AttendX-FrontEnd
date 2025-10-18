@@ -114,7 +114,7 @@ export const getClassByName = createAsyncThunk(
     } catch (error) {
       const message =
         error.response?.data?.message || error.message || error.toString();
-      return thunkApi.rejectWithValue(message);
+      return thunkApi.rejectWithValue(message); 
     }
   }
 );
