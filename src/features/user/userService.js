@@ -63,9 +63,36 @@ const refreshAccessToken = async () => {
   return response.data;
 };
 
+// Update User Profile Function
+async function updateUserProfile(updateData) {
+  // Accepts plain object { name?, section?, semester?, session?, profilePicture? }
+  const formData = new FormData();
+  if (updateData.name !== undefined) formData.append("name", updateData.name);
+  if (updateData.department !== undefined)
+    formData.append("department", updateData.department);
+  if (updateData.section !== undefined)
+    formData.append("section", updateData.section);
+  if (updateData.semester !== undefined)
+    formData.append("semester", updateData.semester);
+  if (updateData.session !== undefined)
+    formData.append("session", updateData.session);
+  if (updateData.profilePicture instanceof File) {
+    formData.append("profilePicture", updateData.profilePicture);
+  }
+
+  const response = await axios.put(`/api/user/profile`, formData, {
+    headers: {},
+  });
+  if (response.data && response.data.success && response.data.data) {
+    localStorage.setItem("user", JSON.stringify(response.data.data));
+  }
+  return response.data;
+}
+
 export const userService = {
   registerUser,
   loginUser,
   logoutUser,
   refreshAccessToken,
+  updateUserProfile,
 };

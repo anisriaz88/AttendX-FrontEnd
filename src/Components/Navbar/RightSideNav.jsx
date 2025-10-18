@@ -1,4 +1,3 @@
-
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -6,7 +5,6 @@ import { logoutUser } from "../../features/user/userSlice.js";
 import LightDarkTheme from "./LightDarkTheme.jsx";
 
 const RightSideNav = () => {
-
   //   get the colors from the redux store
   const { colors } = useSelector((state) => state.color);
 
@@ -19,7 +17,6 @@ const RightSideNav = () => {
 
   //   initialize useDispatch
   const dispatch = useDispatch();
-
 
   // Close user menu on outside click
   useEffect(() => {
@@ -84,8 +81,6 @@ const RightSideNav = () => {
       </ul>
     );
   };
-
-
 
   return (
     <div className="flex gap-3 p-2">

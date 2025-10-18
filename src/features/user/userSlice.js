@@ -10,6 +10,9 @@ const initialState = {
   isLoading: false,
   isSuccess: false,
   message: "",
+  updatingProfile: false,
+  updateProfileError: null,
+  updateProfileSuccess: false,
 };
 
 // Async thunk for user registration
@@ -74,6 +77,20 @@ export const refreshAccessToken = createAsyncThunk(
   }
 );
 
+// Async thunk for updating user profile
+export const updateUserProfile = createAsyncThunk(
+  "user/updateProfile",
+  async (updateData, thunkApi) => {
+    try {
+      const result = await userService.updateUserProfile(updateData);
+      return result;
+    } catch (error) {
+      const message = error?.response?.data?.message || error.message || error.toString();
+      return thunkApi.rejectWithValue(message);
+    }
+  }
+);
+
 // User Slice
 const userSlice = createSlice({
   name: "user",
@@ -115,6 +132,8 @@ const userSlice = createSlice({
         state.user = action.payload.data;
         localStorage.setItem("user", JSON.stringify(action.payload.data));
         state.role = action.payload.data.role;
+        state.isLoggedIn = true;
+
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -131,7 +150,7 @@ const userSlice = createSlice({
         state.isSuccess = true;
         state.user = null;
         localStorage.removeItem("user");
-        document.reload(true);
+        state.isLoggedIn = false;
       })
       .addCase(logoutUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -155,6 +174,27 @@ const userSlice = createSlice({
         state.message = action.payload;
         state.user = null;
         localStorage.removeItem("user");
+        state.isLoggedIn = false;
+      })
+
+      // Update Profile
+      .addCase(updateUserProfile.pending, (state) => {
+        state.updatingProfile = true;
+        state.updateProfileError = null;
+        state.updateProfileSuccess = false;
+      })
+      .addCase(updateUserProfile.fulfilled, (state, action) => {
+        state.updatingProfile = false;
+        state.updateProfileSuccess = true;
+        if (action.payload?.data) {
+          state.user = action.payload.data;
+          state.role = action.payload.data.role;
+          localStorage.setItem("user", JSON.stringify(action.payload.data));
+        }
+      })
+      .addCase(updateUserProfile.rejected, (state, action) => {
+        state.updatingProfile = false;
+        state.updateProfileError = action.payload || "Profile update failed";
       });
   },
 });

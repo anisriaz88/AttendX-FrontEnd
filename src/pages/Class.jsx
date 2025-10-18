@@ -98,7 +98,7 @@ const Class = () => {
           activeTab={activeTab}
           setActiveTab={setActiveTab}
         />
-        <main className="flex-1 p-4 md:p-8 overflow-y-auto flex flex-col gap-8">
+        <main className="flex-1 p-4 md:p-8 overflow-y-auto flex flex-col gap-8 rounded-xl">
           {/* Header / Hero */}
           <section
             className="relative rounded-3xl p-6 md:p-10 shadow-xl overflow-hidden"
