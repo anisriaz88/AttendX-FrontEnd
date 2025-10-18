@@ -55,46 +55,39 @@ useEffect(() => {
 }, [dispatch, classDetails?._id]);
 
 
-  useEffect(() => {
-  if (!isSessionActive || !session) return;
+useEffect(() => {
+  if (!isSessionActive) return;
 
-  const generateQrCode = () => {
-    const newQrValue = `AttendX-Session-${session._id}-${Date.now()}`;
+  const generateQr = () => {
+    const newQrValue = `AttendX-Session-${session?._id || "local"}-${Date.now()}`;
     setQrValue(newQrValue);
     setTimer(30);
   };
 
-  generateQrCode();
-  const qrInterval = setInterval(() => generateQrCode(), 30000);
+  generateQr();
 
-  return () => clearInterval(qrInterval);
+  const qrInterval = setInterval(() => generateQr(), 30000); 
+  const qrCountdown = setInterval(() => {
+    setTimer((prev) => (prev > 0 ? prev - 1 : 0));
+  }, 1000);
+
+  return () => {
+    clearInterval(qrInterval);
+    clearInterval(qrCountdown);
+  };
 }, [isSessionActive, session?._id]);
 
 
+
   useEffect(() => {
-  if (!isSessionActive || !session) return;
-
-  setSessionTimer(300);
-  const countdown = setInterval(() => {
-    setSessionTimer((prev) => (prev > 0 ? prev - 1 : 0));
-  }, 1000);
-
   const autoEnd = setTimeout(() => {
     if (classDetails?._id) dispatch(endSession(classDetails._id));
   }, 5 * 60 * 1000);
 
   return () => {
-    clearInterval(countdown);
     clearTimeout(autoEnd);
   };
 }, [isSessionActive, session?._id]);
-
-  // Handler wired to End Session button
-  const handleEndSession = () => {
-    if (!classDetails?._id) return;
-    dispatch(endSession(classDetails?.class?._id));
-  };
-
 
   return (
     <>
@@ -148,8 +141,6 @@ useEffect(() => {
               <FiActivity />
               {isSessionActive ? "Ongoing Session" : "No Active Session"}
             </span>
-
-            <p>{sessionTimer} Time remaining</p>
           </div>
           <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_top_left,white,transparent_60%)]" />
         </div>
@@ -181,19 +172,10 @@ useEffect(() => {
                     {timer}s
                   </div>
                 </div>
-
-                {/* End Session Button */}
-                <button
-                  onClick={handleEndSession}
-                  // disabled={isLoading}
-                  className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-6 py-3 rounded-xl font-semibold shadow-lg mt-8 transition-all"
-                >
-                  <FiStopCircle /> End Session
-                </button>
               </>
             ) : (
               <>
-                <h2 className="text-xl font-bold mb-6">No Active Session</h2>
+                <h2 className="text-2xl font-bold mb-4">No Active Session</h2>
                 <p className="text-sm opacity-70">
                   Please start a session to generate a QR code.
                 </p>
@@ -201,8 +183,6 @@ useEffect(() => {
             )}  
           </div>
         </div>
-
-        {/* End Button removed - presentational only */}
 
         {/* Floating Notification (Demo) */}
         <div
